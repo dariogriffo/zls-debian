@@ -7,7 +7,7 @@
    <p align="center">
      <a href="https://github.com/zigtools/zls/"><img src="https://github.com/dariogriffo/zls-debian/blob/main/zls-logo.png" alt="Zls Logo" width="128" style="margin-right: 20px"></a>
      <a href="https://www.debian.org/"><img src="https://github.com/dariogriffo/zls-debian/blob/main/debian-logo.png" alt="Debian Logo" width="104" style="margin-left: 20px"></a>
-     <br>Zig for Debian
+     <br>ZLS for Debian
    </p>
 </h1>
 <p align="center">
