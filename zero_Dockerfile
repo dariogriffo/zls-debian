@@ -1,0 +1,57 @@
+ARG DEBIAN_DIST=bookworm
+FROM debian:$DEBIAN_DIST
+
+ARG ZIG_VERSION
+ARG DEBIAN_DIST
+ARG BUILD_VERSION
+ARG FULL_VERSION
+
+RUN apt update && apt install -y curl gpg
+RUN curl -sS https://debian.griffo.io/EA0F721D231FDD3A0A17B9AC7808B4DD62C41256.asc | gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/debian.griffo.io.gpg
+RUN echo "deb https://debian.griffo.io/apt $DEBIAN_DIST main" | tee /etc/apt/sources.list.d/debian.griffo.io.list
+    
+RUN apt update && apt install -y zig git
+RUN git clone https://github.com/zigtools/zls
+RUN mkdir -p /opt/zls/$ZIG_VERSION
+RUN cd zls && git checkout $ZIG_VERSION && zig build --prefix /opt/zls/$ZIG_VERSION -Doptimize=ReleaseSafe
+
+RUN mkdir -p /output/usr/lib/zls/$ZIG_VERSION
+RUN cp "/opt/zls/$ZIG_VERSION/bin/zls" /output/usr/lib/zls/$ZIG_VERSION/
+
+RUN mkdir -p /output/DEBIAN
+RUN mkdir -p /output/usr/share/doc/zls/
+
+COPY packages/zero/output/DEBIAN/control /output/DEBIAN/
+COPY packages/zero/output/DEBIAN/postinst /output/DEBIAN/
+COPY packages/zero/output/DEBIAN/prerm /output/DEBIAN/
+COPY packages/zero/output/DEBIAN/postrm /output/DEBIAN/
+RUN chmod 755 /output/DEBIAN/postinst
+RUN chmod 755 /output/DEBIAN/prerm
+RUN chmod 755 /output/DEBIAN/postrm
+
+COPY packages/zero/output/changelog.Debian /output/usr/share/doc/zls/changelog.Debian
+COPY packages/zero/output/copyright /output/usr/share/doc/zls/
+
+RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/usr/share/doc/zls/changelog.Debian
+RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/usr/share/doc/zls/changelog.Debian
+RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/usr/share/doc/zls/changelog.Debian
+
+RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/control
+RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/control
+RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/control
+
+RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/postinst
+RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/postinst
+RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/postinst
+
+RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/prerm
+RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/prerm
+RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/prerm
+
+RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/postrm
+RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/postrm
+RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/postrm
+
+RUN dpkg-deb --build /output /zls-zero_${FULL_VERSION}.deb
+
+

@@ -1,0 +1,9 @@
+Section: devel
+Priority: optional
+Maintainer: Dario Griffo <dariogriffo@gmail.com>
+Homepage: https://zigtools.org/zls/install/
+Package: zls-0
+Version: BUILD_VERSION+DIST
+Architecture: amd64
+Depends: zig-0
+Description: The Language server protocol implementation for 0.x

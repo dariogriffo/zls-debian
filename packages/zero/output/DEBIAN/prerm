@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+ZIG_BIN="/usr/lib/zls/ZIG_VERSION/zls"
+
+update-alternatives --remove zls "$ZIG_BIN" || true
+
+exit 0
+
