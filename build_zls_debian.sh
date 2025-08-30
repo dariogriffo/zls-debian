@@ -1,6 +1,6 @@
 ZIG_VERSION=$1
 BUILD_VERSION=$2
-declare -a arr=("bookworm" "trixie" "sid")
+declare -a arr=("bookworm" "forky" "trixie" "sid")
 for i in "${arr[@]}"
 do
   DEBIAN_DIST=$i
