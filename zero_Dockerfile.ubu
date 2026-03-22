@@ -1,22 +1,14 @@
-ARG UBUNTU_DIST=noble
-FROM ubuntu:$UBUNTU_DIST
+FROM ubuntu:questing
 
 ARG ZIG_VERSION
 ARG UBUNTU_DIST
 ARG BUILD_VERSION
 ARG FULL_VERSION
-
-RUN apt update && apt install -y curl gpg
-RUN curl -sS https://debian.griffo.io/EA0F721D231FDD3A0A17B9AC7808B4DD62C41256.asc | gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/debian.griffo.io.gpg
-RUN echo "deb https://debian.griffo.io/apt $UBUNTU_DIST main" | tee /etc/apt/sources.list.d/debian.griffo.io.list
-    
-RUN apt update && apt install -y git zig-0
-RUN git clone https://github.com/zigtools/zls
-RUN mkdir -p /opt/zls/$ZIG_VERSION
-RUN cd zls && git checkout $ZIG_VERSION && zig build --prefix /opt/zls/$ZIG_VERSION -Doptimize=ReleaseSafe
+ARG DEB_ARCH=amd64
 
 RUN mkdir -p /output/usr/lib/zls/$ZIG_VERSION
-RUN cp "/opt/zls/$ZIG_VERSION/bin/zls" /output/usr/lib/zls/$ZIG_VERSION/
+COPY zls /output/usr/lib/zls/$ZIG_VERSION/
+RUN chmod 755 /output/usr/lib/zls/$ZIG_VERSION/zls
 
 RUN mkdir -p /output/DEBIAN
 RUN mkdir -p /output/usr/share/doc/zls/
@@ -39,6 +31,7 @@ RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/usr/share/doc/zls/changelog.Deb
 RUN sed -i "s/DIST/$UBUNTU_DIST/" /output/DEBIAN/control
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/control
 RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/control
+RUN sed -i "s/DEB_ARCH/$DEB_ARCH/" /output/DEBIAN/control
 
 RUN sed -i "s/DIST/$UBUNTU_DIST/" /output/DEBIAN/postinst
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/postinst

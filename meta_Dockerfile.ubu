@@ -1,10 +1,10 @@
-ARG UBUNTU_DIST=noble
-FROM ubuntu:$UBUNTU_DIST
+FROM ubuntu:questing
 
 ARG ZIG_VERSION
 ARG UBUNTU_DIST
 ARG BUILD_VERSION
 ARG FULL_VERSION
+ARG DEB_ARCH=amd64
 
 RUN mkdir -p /output/DEBIAN
 
@@ -13,6 +13,7 @@ COPY packages/zls/output/DEBIAN/control /output/DEBIAN/
 RUN sed -i "s/DIST/$UBUNTU_DIST/" /output/DEBIAN/control
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/control
 RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/control
+RUN sed -i "s/DEB_ARCH/$DEB_ARCH/" /output/DEBIAN/control
 
 RUN dpkg-deb --build /output /zls_$FULL_VERSION.deb
 
