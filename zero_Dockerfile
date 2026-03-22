@@ -1,14 +1,15 @@
 FROM debian:trixie
 
+ARG ZLS_VERSION
 ARG ZIG_VERSION
 ARG DEBIAN_DIST
 ARG BUILD_VERSION
 ARG FULL_VERSION
 ARG DEB_ARCH=amd64
 
-RUN mkdir -p /output/usr/lib/zls/$ZIG_VERSION
-COPY zls /output/usr/lib/zls/$ZIG_VERSION/
-RUN chmod 755 /output/usr/lib/zls/$ZIG_VERSION/zls
+RUN mkdir -p /output/usr/lib/zls/$ZLS_VERSION
+COPY zls /output/usr/lib/zls/$ZLS_VERSION/
+RUN chmod 755 /output/usr/lib/zls/$ZLS_VERSION/zls
 
 RUN mkdir -p /output/DEBIAN
 RUN mkdir -p /output/usr/share/doc/zls/
@@ -26,24 +27,25 @@ COPY packages/zero/output/copyright /output/usr/share/doc/zls/
 
 RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/usr/share/doc/zls/changelog.Debian
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/usr/share/doc/zls/changelog.Debian
-RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/usr/share/doc/zls/changelog.Debian
+RUN sed -i "s/ZLS_VERSION/$ZLS_VERSION/" /output/usr/share/doc/zls/changelog.Debian
 
 RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/control
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/control
+RUN sed -i "s/ZLS_VERSION/$ZLS_VERSION/" /output/DEBIAN/control
 RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/control
 RUN sed -i "s/DEB_ARCH/$DEB_ARCH/" /output/DEBIAN/control
 
 RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/postinst
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/postinst
-RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/postinst
+RUN sed -i "s/ZLS_VERSION/$ZLS_VERSION/" /output/DEBIAN/postinst
 
 RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/prerm
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/prerm
-RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/prerm
+RUN sed -i "s/ZLS_VERSION/$ZLS_VERSION/" /output/DEBIAN/prerm
 
 RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/postrm
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/postrm
-RUN sed -i "s/ZIG_VERSION/$ZIG_VERSION/" /output/DEBIAN/postrm
+RUN sed -i "s/ZLS_VERSION/$ZLS_VERSION/" /output/DEBIAN/postrm
 
 RUN dpkg-deb --build /output /zls-zero_${FULL_VERSION}.deb
 

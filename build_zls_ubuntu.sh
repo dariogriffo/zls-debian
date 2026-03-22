@@ -1,5 +1,6 @@
-ZIG_VERSION=$1
-BUILD_VERSION=$2
+ZLS_VERSION=$1
+ZIG_VERSION=$2
+BUILD_VERSION=$3
 
 UNAME_ARCH=$(uname -m)
 case "$UNAME_ARCH" in
@@ -16,7 +17,7 @@ esac
 
 mkdir zls_download
 cd zls_download
-wget https://github.com/zigtools/zls/releases/download/$ZIG_VERSION/zls-$ZLS_ARCH.tar.xz
+wget https://github.com/zigtools/zls/releases/download/$ZLS_VERSION/zls-$ZLS_ARCH.tar.xz
 tar -xf zls-$ZLS_ARCH.tar.xz
 cd ..
 mv zls_download/zls .
@@ -25,14 +26,14 @@ declare -a arr=("jammy" "noble" "questing")
 for i in "${arr[@]}"
 do
   UBUNTU_DIST=$i
-  FULL_VERSION=$ZIG_VERSION-${BUILD_VERSION}+${UBUNTU_DIST}_${DEB_ARCH}_ubu
+  FULL_VERSION=$ZLS_VERSION-${BUILD_VERSION}+${UBUNTU_DIST}_${DEB_ARCH}_ubu
 
-  docker build . -f meta_Dockerfile.ubu -t zls-ubuntu-$UBUNTU_DIST --build-arg ZIG_VERSION=$ZIG_VERSION --build-arg UBUNTU_DIST=$UBUNTU_DIST --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg FULL_VERSION=$FULL_VERSION --build-arg DEB_ARCH=$DEB_ARCH
+  docker build . -f meta_Dockerfile.ubu -t zls-ubuntu-$UBUNTU_DIST --build-arg ZLS_VERSION=$ZLS_VERSION --build-arg ZIG_VERSION=$ZIG_VERSION  --build-arg UBUNTU_DIST=$UBUNTU_DIST --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg FULL_VERSION=$FULL_VERSION --build-arg DEB_ARCH=$DEB_ARCH
   id="$(docker create zls-ubuntu-$UBUNTU_DIST)"
   docker cp $id:/zls_$FULL_VERSION.deb - > ./zls_$FULL_VERSION.deb
   tar -xf ./zls_$FULL_VERSION.deb
 
-  docker build . -f zero_Dockerfile.ubu -t zls-ubuntu-$UBUNTU_DIST --build-arg ZIG_VERSION=$ZIG_VERSION --build-arg UBUNTU_DIST=$UBUNTU_DIST --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg FULL_VERSION=$FULL_VERSION --build-arg DEB_ARCH=$DEB_ARCH
+  docker build . -f zero_Dockerfile.ubu -t zls-ubuntu-$UBUNTU_DIST --build-arg ZLS_VERSION=$ZLS_VERSION --build-arg ZIG_VERSION=$ZIG_VERSION  --build-arg UBUNTU_DIST=$UBUNTU_DIST --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg FULL_VERSION=$FULL_VERSION --build-arg DEB_ARCH=$DEB_ARCH
   id="$(docker create zls-ubuntu-$UBUNTU_DIST)"
   docker cp $id:/zls-zero_$FULL_VERSION.deb - > ./zls-zero_$FULL_VERSION.deb
   tar -xf ./zls-zero_$FULL_VERSION.deb

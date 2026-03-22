@@ -1,13 +1,7 @@
 #!/bin/sh
 set -e
 
-
-ZIG_BIN="/usr/lib/zig/ZIG_VERSION/zig"
-ZLS_BIN="/usr/lib/zig/ZIG_VERSION/zls"
-
-if [ -f "$ZIG_BIN" ]; then
-    update-alternatives --remove zig "$ZIG_BIN" || true
-fi
+ZLS_BIN="/usr/lib/zig/ZLS_VERSION/zls"
 
 if [ -f "$ZLS_BIN" ]; then
     update-alternatives --remove zls "$ZLS_BIN" || true
