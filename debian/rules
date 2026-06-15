@@ -1,0 +1,41 @@
+#!/usr/bin/make -f
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+ZLS_VERSION := $(shell dpkg-parsechangelog -S Version | sed 's/[-~].*//')
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+
+override_dh_auto_build:
+	@arch="$(DEB_HOST_ARCH)"; \
+	case "$$arch" in \
+		amd64)   ZLS_ARCH="x86_64-linux" ;; \
+		arm64)   ZLS_ARCH="aarch64-linux" ;; \
+		armhf)   ZLS_ARCH="arm-linux" ;; \
+		i386)    ZLS_ARCH="x86-linux" ;; \
+		ppc64el) ZLS_ARCH="powerpc64le-linux" ;; \
+		riscv64) ZLS_ARCH="riscv64-linux" ;; \
+		s390x)   ZLS_ARCH="s390x-linux" ;; \
+		loong64) ZLS_ARCH="loongarch64-linux" ;; \
+		*) echo "Unsupported architecture: $$arch"; exit 1 ;; \
+	esac; \
+	echo "Downloading zls-$$ZLS_ARCH for $(ZLS_VERSION)..."; \
+	wget -q "https://github.com/zigtools/zls/releases/download/$(ZLS_VERSION)/zls-$$ZLS_ARCH.tar.xz"; \
+	mkdir -p zls_extract; \
+	tar -xf "zls-$$ZLS_ARCH.tar.xz" -C zls_extract; \
+	rm -f "zls-$$ZLS_ARCH.tar.xz"; \
+	echo "$$ZLS_ARCH" > .zls_arch_name
+
+override_dh_auto_install:
+	@ZLS_ARCH=$$(cat .zls_arch_name); \
+	install -D -m 755 zls_extract/zls debian/zls-zero/usr/lib/zls/$(ZLS_VERSION)/zls
+
+override_dh_auto_test:
+
+override_dh_auto_clean:
+	@rm -rf zls_extract .zls_arch_name || true
+
+override_dh_strip:
+
+override_dh_shlibdeps:

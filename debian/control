@@ -1,0 +1,22 @@
+Source: zls
+Section: utils
+Priority: optional
+Maintainer: Dario Griffo <dariogriffo@gmail.com>
+Build-Depends: debhelper-compat (= 13), wget, ca-certificates
+Standards-Version: 4.6.2
+Homepage: https://github.com/zigtools/zls
+Rules-Requires-Root: no
+
+Package: zls
+Architecture: all
+Depends: zls-zero
+Description: Zig Language Server (meta-package)
+ This meta-package depends on the zls-zero package which provides
+ the Zig Language Server binary at /usr/lib/zls/{VERSION}/.
+
+Package: zls-zero
+Architecture: amd64 arm64 armhf i386 ppc64el riscv64 s390x loong64
+Depends: ${misc:Depends}
+Description: Zig Language Server binary
+ Provides the Zig Language Server (zls) binary installed at
+ /usr/lib/zls/{VERSION}/zls for use with the Zig programming language.

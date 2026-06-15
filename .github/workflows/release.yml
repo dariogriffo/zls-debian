@@ -22,14 +22,14 @@ permissions:
 jobs:
   build-zls:
     name: Build
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout zls-debian
         uses: actions/checkout@v4
 
       - name: Build zls
         run: ./build_zls.sh ${{ inputs.zls_version }}  ${{ inputs.zig_version }}  ${{ inputs.build_version }}
-      
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -38,17 +38,43 @@ jobs:
             zls-zero_*.deb
             zls_*.deb
 
+  build-src:
+    name: Build Source Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout zls-debian
+        uses: actions/checkout@v4
+
+      - name: Install dpkg-dev
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends dpkg-dev devscripts wget ca-certificates
+
+      - name: Build source packages
+        run: ./build_src.sh ${{ inputs.zls_version }} ${{ inputs.build_version }}
+
+      - name: Upload Source Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-artifact
+          path: |
+            zls_*.dsc
+            zls_*.orig.tar.gz
+            zls_*.debian.tar.xz
 
   release-zls:
     name: (Draft-)Release zls
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: build-zls
+    needs: [build-zls, build-src]
     steps:
       - name: Download All Artifacts
         uses: actions/download-artifact@v4
         with:
           name: artifact
+
+      - name: Download Source Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: source-artifact
 
       - name: Publish Release Draft
         uses: softprops/action-gh-release@v2
@@ -57,7 +83,9 @@ jobs:
           files:  |
             zls-zero_*.deb
             zls_*.deb
+            zls_*.dsc
+            zls_*.orig.tar.gz
+            zls_*.debian.tar.xz
           name: ${{ inputs.zls_version }}+${{ inputs.build_version }}
           tag_name: ${{ env.RELEASE_TAG }}
           fail_on_unmatched_files: true
-
