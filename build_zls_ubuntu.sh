@@ -26,7 +26,7 @@ declare -a arr=("jammy" "noble" "questing")
 for i in "${arr[@]}"
 do
   UBUNTU_DIST=$i
-  FULL_VERSION=$ZLS_VERSION-${BUILD_VERSION}+${UBUNTU_DIST}_${DEB_ARCH}_ubu
+  FULL_VERSION=$ZLS_VERSION-${BUILD_VERSION}~${UBUNTU_DIST}_${DEB_ARCH}_ubu
 
   docker build . -f meta_Dockerfile.ubu -t zls-ubuntu-$UBUNTU_DIST --build-arg ZLS_VERSION=$ZLS_VERSION --build-arg ZIG_VERSION=$ZIG_VERSION  --build-arg UBUNTU_DIST=$UBUNTU_DIST --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg FULL_VERSION=$FULL_VERSION --build-arg DEB_ARCH=$DEB_ARCH
   id="$(docker create zls-ubuntu-$UBUNTU_DIST)"

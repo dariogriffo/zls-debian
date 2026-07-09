@@ -26,7 +26,7 @@ declare -a arr=("bookworm" "trixie" "forky" "sid")
 for i in "${arr[@]}"
 do
   DEBIAN_DIST=$i
-  FULL_VERSION=$ZLS_VERSION-${BUILD_VERSION}+${DEBIAN_DIST}_${DEB_ARCH}
+  FULL_VERSION=$ZLS_VERSION-${BUILD_VERSION}~${DEBIAN_DIST}_${DEB_ARCH}
 
   docker build . -t zls-$DEBIAN_DIST --build-arg ZLS_VERSION=$ZLS_VERSION --build-arg ZIG_VERSION=$ZIG_VERSION --build-arg DEBIAN_DIST=$DEBIAN_DIST --build-arg BUILD_VERSION=$BUILD_VERSION --build-arg FULL_VERSION=$FULL_VERSION --build-arg DEB_ARCH=$DEB_ARCH -f meta_Dockerfile
   id="$(docker create zls-$DEBIAN_DIST)"
