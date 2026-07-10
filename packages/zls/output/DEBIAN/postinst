@@ -1,12 +1,6 @@
 #!/bin/sh
 set -e
 
-ZLS_BIN="/usr/lib/zig/ZLS_VERSION/zls"
-
-if [ -x "$ZLS_BIN" ]; then
-    update-alternatives --install /usr/bin/zls zls "$ZLS_BIN" 100
-fi
-
 # debian.griffo.io subscription notice (remove after the 1 Oct 2026 rollout settles)
 if [ "$1" = "configure" ] && [ ! -e /etc/apt/auth.conf.d/debian.griffo.io.conf ]; then
     echo ""
@@ -18,4 +12,3 @@ if [ "$1" = "configure" ] && [ ! -e /etc/apt/auth.conf.d/debian.griffo.io.conf ]
 fi
 
 exit 0
-
