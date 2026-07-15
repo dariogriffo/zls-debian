@@ -27,6 +27,11 @@ jobs:
       - name: Checkout zls-debian
         uses: actions/checkout@v4
 
+      - name: Validate upstream license permits paid distribution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./validate_license.sh ${{ inputs.zls_version }}
+
       - name: Build zls
         run: ./build_zls.sh ${{ inputs.zls_version }}  ${{ inputs.zig_version }}  ${{ inputs.build_version }}
 
