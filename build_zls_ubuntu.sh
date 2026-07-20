@@ -22,7 +22,7 @@ tar -xf zls-$ZLS_ARCH.tar.xz
 cd ..
 mv zls_download/zls .
 
-declare -a arr=("jammy" "noble" "questing")
+declare -a arr=("jammy" "noble" "questing" "resolute")
 for i in "${arr[@]}"
 do
   UBUNTU_DIST=$i
