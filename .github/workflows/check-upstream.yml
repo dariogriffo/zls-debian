@@ -1,0 +1,82 @@
+name: Check for new zls release
+
+on:
+  schedule:
+    # Hourly, offset to avoid the top-of-hour rush. releases/latest already
+    # excludes prereleases and drafts, so we only ever chase stable tags.
+    - cron: "23 * * * *"
+  workflow_dispatch: {}
+
+# Only one checker at a time.
+concurrency:
+  group: check-upstream
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write   # required to dispatch release.yml
+
+jobs:
+  check:
+    name: Compare upstream vs published
+    runs-on: ubuntu-latest
+    steps:
+      - name: Detect and dispatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # Latest stable zls tag upstream (e.g. 0.16.0).
+          UPSTREAM=$(gh api repos/zigtools/zls/releases/latest -q .tag_name)
+          echo "Upstream zls: $UPSTREAM"
+
+          # Our latest published release tag is "<zls>+<build>" (e.g. 0.16.0+1).
+          # 404 (no releases yet) -> empty -> treat as "needs building".
+          OURS=$(gh api repos/${{ github.repository }}/releases/latest -q .tag_name 2>/dev/null || echo "")
+          OURS_ZLS="${OURS%%+*}"
+          echo "Ours: ${OURS:-<none>} (zls part: ${OURS_ZLS:-<none>})"
+
+          if [ "$UPSTREAM" = "$OURS_ZLS" ]; then
+            echo "Up to date, nothing to do."
+            exit 0
+          fi
+
+          # Don't dispatch a duplicate if a build is already running/queued.
+          ACTIVE=$(gh run list --workflow=release.yml \
+            --json status \
+            -q '[.[] | select(.status == "in_progress" or .status == "queued")] | length')
+          if [ "$ACTIVE" -gt 0 ]; then
+            echo "A release.yml run is already active ($ACTIVE); skipping this tick."
+            exit 0
+          fi
+
+          # Unlike most tools, release.yml also needs the zig version this zls
+          # targets — it becomes "Recommends: zig-0 (>= ZIG_VERSION)" on zls-0.
+          # zls declares it in build.zig.zon, so read it at the release tag
+          # rather than from the default branch (which tracks zig master).
+          ZON=$(gh api "repos/zigtools/zls/contents/build.zig.zon?ref=${UPSTREAM}" -q .content | base64 -d)
+          ZIG=$(printf '%s' "$ZON" \
+            | sed -n 's/.*\.minimum_zig_version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' \
+            | head -1)
+
+          if [ -z "$ZIG" ]; then
+            echo "::error::could not read .minimum_zig_version from build.zig.zon at ${UPSTREAM}"
+            exit 1
+          fi
+
+          # A dev/nightly zig requirement (e.g. 0.17.0-dev.292+fc1c83a36) has no
+          # matching zig-0 package in the mirror, so a dependency built from it
+          # would be unsatisfiable. Stop and let a human decide instead.
+          case "$ZIG" in
+            *-dev*|*+*)
+              echo "::error::zls ${UPSTREAM} requires a dev zig (${ZIG}); dispatch manually once a stable zig ships"
+              exit 1 ;;
+          esac
+
+          echo "New zls release detected: ${OURS_ZLS:-<none>} -> $UPSTREAM (zig >= $ZIG). Dispatching build."
+          gh workflow run release.yml \
+            -f zls_version="$UPSTREAM" \
+            -f zig_version="$ZIG" \
+            -f build_version=1
