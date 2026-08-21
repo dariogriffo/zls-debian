@@ -1,4 +1,5 @@
-FROM ubuntu:questing
+ARG UBUNTU_DIST=noble
+FROM ubuntu:$UBUNTU_DIST
 
 ARG ZLS_VERSION
 ARG UBUNTU_DIST
@@ -7,11 +8,17 @@ ARG FULL_VERSION
 ARG DEB_ARCH=amd64
 
 RUN mkdir -p /output/DEBIAN
+RUN mkdir -p /output/usr/share/doc/zls
 
 COPY packages/zls/output/DEBIAN/control /output/DEBIAN/
 COPY packages/zls/output/DEBIAN/postinst /output/DEBIAN/postinst
 RUN chmod 755 /output/DEBIAN/postinst
+COPY packages/zls/output/copyright /output/usr/share/doc/zls/
+COPY packages/zls/output/changelog.Debian /output/usr/share/doc/zls/
 
+RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/;s/ZLS_VERSION/$ZLS_VERSION/;s/DIST/$UBUNTU_DIST/g" /output/usr/share/doc/zls/changelog.Debian
+RUN gzip -9n /output/usr/share/doc/zls/changelog.Debian
+RUN find /output/usr -type f -exec chmod 644 {} +
 RUN sed -i "s/DIST/$UBUNTU_DIST/" /output/DEBIAN/control
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/control
 RUN sed -i "s/ZLS_VERSION/$ZLS_VERSION/" /output/DEBIAN/control

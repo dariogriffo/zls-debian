@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-ZLS_BIN="/usr/lib/zig/ZLS_VERSION/zls"
+ZLS_BIN="/usr/lib/zls/ZLS_VERSION/zls"
 
 if [ -x "$ZLS_BIN" ]; then
     update-alternatives --install /usr/bin/zls zls "$ZLS_BIN" 100

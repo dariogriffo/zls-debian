@@ -19,10 +19,30 @@
 This repository contains build scripts to produce the _unofficial_ Debian packages
 (.deb) for [Zls](https://github.com/zigtools/zls) hosted at [deb.griffo.io](https://deb.griffo.io)
 
-Currently supported debian distros are:
-- Bookworm
-- Trixie
-- Sid
+Currently supported Debian distros are:
+- Bookworm (v12)
+- Trixie (v13)
+- Forky (v14)
+- Sid (testing)
+
+Currently supported Ubuntu distros are:
+- Jammy (22.04)
+- Noble (24.04)
+- Questing (25.10)
+- Resolute (26.04)
+
+Supported architectures:
+- amd64 (x86_64)
+- arm64 (aarch64)
+- armhf (32-bit ARM, hard float)
+- i386 (x86 32-bit)
+- ppc64el (POWER little-endian)
+- riscv64
+- s390x
+- loong64 (LoongArch64)
+
+Every zls binary is statically linked, so each package runs on every suite it
+is built for and needs no dependencies.
 
 This is an unofficial community project to provide a package that's easy to
 install on Debian. If you're looking for the Zls source code, see

@@ -79,4 +79,5 @@ jobs:
           gh workflow run release.yml \
             -f zls_version="$UPSTREAM" \
             -f zig_version="$ZIG" \
-            -f build_version=1
+            -f build_version=1 \
+            -f architecture=all

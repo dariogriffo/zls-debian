@@ -1,5 +1,8 @@
-zls (BUILD_VERSION) DIST; urgency=low
-  
-  * https://github.com/zigtools/zls/releases
+zls (ZLS_VERSION-BUILD_VERSION~DIST) DIST; urgency=low
 
- -- Dario Griffo <dariogriffo@gmail.com>  2025-07-13T08:00:00+00:00
+  * New upstream release ZLS_VERSION.
+
+  zls publishes its release notes with each tag; the changelog for this and
+  every other version lives at https://github.com/zigtools/zls/releases
+
+ -- Dario Griffo <dariogriffo@gmail.com>  Fri, 21 Aug 2026 00:00:00 +0000

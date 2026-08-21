@@ -15,6 +15,20 @@ on:
         description: The build version.
         type: string
         required: true
+      architecture:
+        description: Architecture to build (amd64, arm64, armhf, i386, ppc64el, riscv64, s390x, loong64, or 'all' for all architectures)
+        type: choice
+        default: 'all'
+        options:
+          - 'all'
+          - 'amd64'
+          - 'arm64'
+          - 'armhf'
+          - 'i386'
+          - 'ppc64el'
+          - 'riscv64'
+          - 's390x'
+          - 'loong64'
 
 permissions:
   contents: write
@@ -33,7 +47,7 @@ jobs:
         run: ./validate_license.sh ${{ inputs.zls_version }}
 
       - name: Build zls
-        run: ./build_zls.sh ${{ inputs.zls_version }}  ${{ inputs.zig_version }}  ${{ inputs.build_version }}
+        run: ./build_zls.sh ${{ inputs.zls_version }} ${{ inputs.zig_version }} ${{ inputs.build_version }} ${{ inputs.architecture }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

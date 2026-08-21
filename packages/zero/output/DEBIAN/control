@@ -6,4 +6,10 @@ Package: zls-0
 Version: ZLS_VERSION-BUILD_VERSION~DIST
 Architecture: DEB_ARCH
 Recommends: zig-0 (>= ZIG_VERSION)
-Description: The Language server protocol implementation for 0.x
+Description: Language server for the Zig programming language (0.x series)
+ zls is the Zig Language Server: completion, go-to-definition, diagnostics,
+ inlay hints and formatting for Zig, spoken over the Language Server Protocol
+ and understood by any editor with an LSP client.
+ .
+ This package carries the build for the Zig 0.x series and registers
+ /usr/bin/zls through update-alternatives.
